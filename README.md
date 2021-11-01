@@ -12,8 +12,8 @@ Field |   | Allowable values |   | Special Characters
 Minutes |   | 0-59 |   | , - * /
 Hours |   | 0-23 |   | , - * /
 Day of month |   | 1-31 |   | , - * /
-Month |   | 1-12 or JAN-DEC (note: english abbreviations) |   | , - * /
-Day of week |   | 1-7 or MON-SUN (note: english abbreviations) |   | , - * /
+Month |   | 1-12 or JAN-DEC  |   | , - * /
+Day of week |   | 1-7 or MON-SUN |   | , - * /
 Command |   | User command ex. /usr/bin/find |  
 
 '*' Can be used in all fields and means 'for all values'. E.g. "*" in minutes, means 'for all minutes'
@@ -27,4 +27,89 @@ Command |   | User command ex. /usr/bin/find |  
 **Case-sensitive** No fields are case-sensitive
 
 **Dependencies between fields** Fields are always evaluated independently, but the expression doesn't evaluate until the constraints of each field are met. Overlap of intervals are not allowed. That is: for Day-of-week field "FRI-MON" is invalid,but "FRI-SUN,MON" is valid
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+# Tools and Technologies
+A Java project for Deliveroo Cron Expression. The project is built with following:
+* Openjdk 11 
+* Build tool: Gradle 7.2
+* IntelliJ IDEA 2021.2.3
+
+## Howto's:
+
+### Build the project: 
+* Checkout the project.
+* Build the project with build script compose gradle tasks: 
+    
+    `./build.sh`
+
+### Execution:
+* After the build is done excute the expression parser with following:
+
+    `./CronExpressionParser.sh <cron expression>`
+
+## Supported Expression Syntex: 
+
+Following are the cron expression syntex which are supported. 
+### Minutes:
+Minutes against which cron job will execute.
+  
+**example**
+
+
+![image](https://user-images.githubusercontent.com/20536693/139684944-9391db86-8319-473a-92f0-8fc294c7e609.png)
+
+
+### Hour:
+Hour against which cron job will execute.
+
+**curl example**
+
+
+![image](https://user-images.githubusercontent.com/20536693/139685017-eb257072-7242-428f-b020-f5d91a2d5cd2.png)
+
+
+### Day of month:
+Days on month when cron job will execute.
+
+**curl example**
+
+
+![image](https://user-images.githubusercontent.com/20536693/139685068-b83b5af0-a2dc-44ed-94b8-4fecd5b3cbc4.png)
+
+
+### Month:
+Months when cron job will execute.
+
+**curl example**
+
+
+![image](https://user-images.githubusercontent.com/20536693/139685225-bfef98fe-aec2-418f-b219-e5185d048dea.png)
+
+
+![image](https://user-images.githubusercontent.com/20536693/139685282-76340b2a-204c-4896-8f62-3f98367a1224.png)
+
+
+### Day of week:
+Days of week when cron job will execute.
+
+**curl example**
+
+
+![image](https://user-images.githubusercontent.com/20536693/139685343-8740ad43-c6ae-4d48-af06-88b4cc30ad10.png)
+
+
+![image](https://user-images.githubusercontent.com/20536693/139685404-425e57e9-c617-4904-beec-d202c16ecddf.png)
+
+
+## Test Coverage
+
+Classes: 100% 
+Lines: 93%
+
+Full report screenshot below:
+
+![image](https://user-images.githubusercontent.com/20536693/139686179-d2a89518-a399-4905-8453-62b38391423e.png)
+
+
 
