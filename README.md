@@ -104,8 +104,8 @@ Days of week when cron job will execute.
 
 ## Test Coverage
 
-Classes: 100% 
-Lines: 93%
+![image](https://user-images.githubusercontent.com/20536693/139686517-a5d5e6d1-4931-454c-b52e-1c6ae240eb63.png)
+
 
 Full report screenshot below:
 
