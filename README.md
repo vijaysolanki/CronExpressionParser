@@ -113,7 +113,7 @@ Days of week when cron job will execute.
 
 
 -------------------------------------------------------------------------------------------------------------------
-# Feature Improvement
+# Future Enhancement
 - Support for L (last), W (Weekday), ? (Ignore) and # (“N-th” occurrence)  special characters.
 
 
