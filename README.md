@@ -112,5 +112,13 @@ Days of week when cron job will execute.
 ![image](https://user-images.githubusercontent.com/20536693/139687700-79a3c8ea-65d3-489c-997e-a16979d2eba1.png)
 
 
+-------------------------------------------------------------------------------------------------------------------
+# Feature Improvement
+- Support for L (last), W (Weekday), ? (Ignore) and # (“N-th” occurrence)  special characters.
 
 
+# References
+- [A Guide To Cron Expressions](https://www.baeldung.com/cron-expressions)
+- [A Guide To Java Regular Expressions API](https://www.baeldung.com/regular-expressions-java)
+- [Cron Expression Generator & Explainer - Quartz](https://www.freeformatter.com/cron-expression-generator-quartz.html)
+- [Regular Expression ](https://regex101.com/r/vH8gX6/3)
