@@ -107,9 +107,10 @@ Days of week when cron job will execute.
 ![image](https://user-images.githubusercontent.com/20536693/139686517-a5d5e6d1-4931-454c-b52e-1c6ae240eb63.png)
 
 
-Full report screenshot below:
+**Full report screenshot below:**
 
-![image](https://user-images.githubusercontent.com/20536693/139686179-d2a89518-a399-4905-8453-62b38391423e.png)
+![image](https://user-images.githubusercontent.com/20536693/139687700-79a3c8ea-65d3-489c-997e-a16979d2eba1.png)
+
 
 
 
