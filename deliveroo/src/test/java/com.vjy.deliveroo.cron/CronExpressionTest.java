@@ -1,24 +1,16 @@
 package com.vjy.deliveroo.cron;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import org.junit.Test;
+import util.Utility;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.vjy.deliveroo.cron.fields.DayOfMonthField;
-import com.vjy.deliveroo.cron.fields.DayOfWeekField;
-import com.vjy.deliveroo.cron.fields.FieldType;
-import com.vjy.deliveroo.cron.fields.SimpleField;
+import static org.junit.Assert.assertEquals;
+import static util.Utility.buildDescription;
+import static util.Utility.getDayOfMonths;
 
 public class CronExpressionTest {
 
@@ -32,39 +24,16 @@ public class CronExpressionTest {
         new CronExpression(null);
     }
 
-    public String buildDescription(CronExpression exp, Set<Integer> min, Set<Integer> hour, Set<Integer> dayOfMonth,
-                                   Set<Integer> month, Set<Integer> dayOfWeek, String cmd) {
-
-        StringBuffer result = new StringBuffer();
-        result.append(exp.getString(FieldType.MINUTE.getIdentifier(), min));
-        result.append("\n");
-
-        result.append(exp.getString(FieldType.HOUR.getIdentifier(), hour));
-        result.append("\n");
-
-        result.append(exp.getString(FieldType.DAY_OF_MONTH.getIdentifier(), dayOfMonth));
-        result.append("\n");
-
-        result.append(exp.getString(FieldType.MONTH.getIdentifier(), month));
-        result.append("\n");
-
-        result.append(exp.getString(FieldType.DAY_OF_WEEK.getIdentifier(), dayOfWeek));
-        result.append("\n");
-
-        result.append(exp.getString("command", Collections.<Integer>emptySet(), cmd));
-        return result.toString();
-    }
-
     @Test
     public void check_all() {
         CronExpression cronExpr = new CronExpression("* * * * * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(IntStream.range(0, 60).boxed().collect(Collectors.toList()));
-        Set<Integer> hour = new TreeSet<>(IntStream.range(0, 24).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = IntStream.range(0, 60).boxed().collect(Collectors.toList());
+        List<Integer> hour = IntStream.range(0, 24).boxed().collect(Collectors.toList());
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -76,11 +45,11 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("3 * * * * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(IntStream.range(3, 4).boxed().collect(Collectors.toList()));
-        Set<Integer> hour = new TreeSet<>(IntStream.range(0, 24).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = List.of(3);
+        List<Integer> hour = IntStream.range(0, 24).boxed().collect(Collectors.toList());
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -92,14 +61,13 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("0/15 * * * * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0, 15, 30, 45));
-        Set<Integer> hour = new TreeSet<>(IntStream.range(0, 24).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = List.of(0, 15, 30, 45);
+        List<Integer> hour = IntStream.range(0, 24).boxed().collect(Collectors.toList());
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
-
         assertEquals(buildDescription, des);
 
     }
@@ -109,11 +77,11 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("7,19 * * * * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(7, 19));
-        Set<Integer> hour = new TreeSet<>(IntStream.range(0, 24).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = List.of(7, 19);
+        List<Integer> hour = IntStream.range(0, 24).boxed().collect(Collectors.toList());
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -125,11 +93,12 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("* 3 * * * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(IntStream.range(0, 60).boxed().collect(Collectors.toList()));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(3));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = IntStream.range(0, 60).boxed().collect(Collectors.toList());
+        List<Integer> hour = List.of(3);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
+
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -141,11 +110,11 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("* 0/15 * * * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(IntStream.range(0, 60).boxed().collect(Collectors.toList()));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0, 15));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = IntStream.range(0, 60).boxed().collect(Collectors.toList());
+        List<Integer> hour = List.of(0, 15);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -157,11 +126,11 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("* 7,19 * * * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(IntStream.range(0, 60).boxed().collect(Collectors.toList()));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(7, 19));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = IntStream.range(0, 60).boxed().collect(Collectors.toList());
+        List<Integer> hour = List.of(7, 19);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -174,11 +143,11 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("* * 3 * * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(IntStream.range(0, 60).boxed().collect(Collectors.toList()));
-        Set<Integer> hour = new TreeSet<>(IntStream.range(0, 24).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfMonth = new TreeSet<>(Arrays.asList(3));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = IntStream.range(0, 60).boxed().collect(Collectors.toList());
+        List<Integer> hour = IntStream.range(0, 24).boxed().collect(Collectors.toList());
+        List<Integer> dayOfMonth = List.of(3);
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -186,15 +155,15 @@ public class CronExpressionTest {
     }
 
     @Test
-    public void check_dayOfMonth_increment() throws Exception {
+    public void check_dayOfMonth_increment() {
         CronExpression cronExpr = new CronExpression("0 0 1/15 * * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(Arrays.asList(1, 16, 31));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = List.of(1, 16, 31);
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -203,15 +172,15 @@ public class CronExpressionTest {
     }
 
     @Test
-    public void check_dayOfMonth_list() throws Exception {
+    public void check_dayOfMonth_list() {
         CronExpression cronExpr = new CronExpression("0 0 7,19 * * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(Arrays.asList(7, 19));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = List.of(7, 19);
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -234,11 +203,11 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("0 0 1 5 * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(Arrays.asList(1));
-        Set<Integer> month = new TreeSet<>(Arrays.asList(5));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = List.of(1);
+        List<Integer> month = List.of(5);
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -250,11 +219,11 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("0 0 1 5/2 * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(Arrays.asList(1));
-        Set<Integer> month = new TreeSet<>(Arrays.asList(5, 7, 9, 11));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = List.of(1);
+        List<Integer> month = List.of(5, 7, 9, 11);
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -266,11 +235,11 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("0 0 1 3,7,12 * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(Arrays.asList(1));
-        Set<Integer> month = new TreeSet<>(Arrays.asList(3, 7, 12));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = List.of(1);
+        List<Integer> month = List.of(3, 7, 12);
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -282,15 +251,72 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("0 0 1 MAR,JUL,DEC * /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(Arrays.asList(1));
-        Set<Integer> month = new TreeSet<>(Arrays.asList(3, 7, 12));
-        Set<Integer> dayOfWeek = new TreeSet<>(IntStream.range(1, 8).boxed().collect(Collectors.toList()));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = List.of(1);
+        List<Integer> month = List.of(3, 7, 12);
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
         assertEquals(buildDescription, des);
+    }
+
+    @Test
+    public void check_dayOfMonth_last() {
+        CronExpression cronExpr = new CronExpression("0 0 L * * /usr/bin/find");
+        String des = cronExpr.describe();
+
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfMonth = getDayOfMonths(month, 0);
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
+
+        String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
+
+        assertEquals(buildDescription, des);
+    }
+
+    @Test
+    public void check_dayOfMonth_number_last_L() {
+        CronExpression cronExpr = new CronExpression("0 0 3L 1,3,6 * /usr/bin/find");
+        String des = cronExpr.describe();
+
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> month = List.of(1, 3, 6);
+        List<Integer> dayOfMonth = getDayOfMonths(month, 3);
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
+
+        String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
+        assertEquals(buildDescription, des);
+    }
+
+    @Test
+    public void check_dayOfMonth_closest_weekday_W() {
+        CronExpression cronExpr = new CronExpression("0 0 10W 5 * /usr/bin/find");
+        String des = cronExpr.describe();
+
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> month = List.of(5);
+        List<Integer> dayOfMonth = Utility.getNearestWeekday(10, List.of(5)/*, dateTime*/);
+        List<Integer> dayOfWeek = IntStream.range(1, 8).boxed().collect(Collectors.toList());
+
+        String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
+        assertEquals(buildDescription, des);
+    }
+
+
+    @Test(expected = IllegalArgumentException.class)
+    public void check_dayofmonth_invalid_modifier() {
+        new CronExpression("0 0 1 L-3 * /usr/bin/find");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void check_dayofmonth_last_with_list() {
+        new CronExpression("0 0 1 1,2,3L * /usr/bin/find");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -298,16 +324,17 @@ public class CronExpressionTest {
         new CronExpression("0 0 1 ? * /usr/bin/find");
     }
 
+
     @Test
     public void check_dayOfWeek_number() {
         CronExpression cronExpr = new CronExpression("0 0 * * 3 /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(Arrays.asList(3));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = List.of(3);
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -316,15 +343,33 @@ public class CronExpressionTest {
     }
 
     @Test
+    public void check_dayOfWeek_complex() {
+        CronExpression cronExpr = new CronExpression("0 0 * * 1-2,3/2 /usr/bin/find");
+        String des = cronExpr.describe();
+
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = List.of(1, 2, 3, 5, 7);
+
+        String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
+
+        assertEquals(buildDescription, des);
+
+    }
+
+
+    @Test
     public void check_dayOfWeek_increment() {
         CronExpression cronExpr = new CronExpression("0 0 * * 3/2 /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(Arrays.asList(3, 5, 7));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = List.of(3, 5, 7);
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -336,11 +381,11 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("0 0 * * 1,5,7 /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(Arrays.asList(1, 5, 7));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = List.of(1, 5, 7);
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -352,11 +397,11 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("0 0 * * MON,FRI,SUN /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(Arrays.asList(1, 5, 7));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = List.of(1, 5, 7);
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -378,11 +423,11 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("0 0 * * 0 /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(Arrays.asList(7));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = List.of(7);
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
@@ -395,16 +440,46 @@ public class CronExpressionTest {
         CronExpression cronExpr = new CronExpression("0 0 * * 7 /usr/bin/find");
         String des = cronExpr.describe();
 
-        Set<Integer> min = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> hour = new TreeSet<>(Arrays.asList(0));
-        Set<Integer> dayOfMonth = new TreeSet<>(IntStream.range(1, 32).boxed().collect(Collectors.toList()));
-        Set<Integer> month = new TreeSet<>(IntStream.range(1, 13).boxed().collect(Collectors.toList()));
-        Set<Integer> dayOfWeek = new TreeSet<>(Arrays.asList(7));
+        List<Integer> min = List.of(0);
+        List<Integer> hour = List.of(0);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = List.of(7);
 
         String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
 
         assertEquals(buildDescription, des);
 
+    }
+
+    @Test
+    public void check_dayOfWeek_last_friday_in_month() {
+        CronExpression cronExpr = new CronExpression("1 3 * * L /usr/bin/find");
+        String des = cronExpr.describe();
+
+        List<Integer> min = List.of(1);
+        List<Integer> hour = List.of(3);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = IntStream.range(1, 13).boxed().collect(Collectors.toList());
+        List<Integer> dayOfWeek = Utility.getLastDayOfWeekInMonths(0, new ArrayList<>(month));
+
+        String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
+        assertEquals(buildDescription, des);
+    }
+
+    @Test
+    public void check_dayOfWeek_nth_day_in_month() {
+        CronExpression cronExpr = new CronExpression("1 3 * 4,5,6 3#2 /usr/bin/find");
+        String des = cronExpr.describe();
+
+        List<Integer> min = List.of(1);
+        List<Integer> hour = List.of(3);
+        List<Integer> dayOfMonth = IntStream.range(1, 32).boxed().collect(Collectors.toList());
+        List<Integer> month = List.of(4, 5, 6);
+        List<Integer> dayOfWeek = Utility.getNthDayOfWeekInMonth(3, 2, month);
+
+        String buildDescription = buildDescription(cronExpr, min, hour, dayOfMonth, month, dayOfWeek, "/usr/bin/find");
+        assertEquals(buildDescription, des);
     }
 
     @Test
@@ -427,5 +502,4 @@ public class CronExpressionTest {
     public void shall_not_not_support_rolling_period() {
         new CronExpression("* 5-1 * * * /usr/bin/find");
     }
-
 }

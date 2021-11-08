@@ -11,30 +11,29 @@ import java.util.regex.Pattern;
  */
 public abstract class BaseField {
 
-    public static final String INCREMENT_SEP = "/";
-
     //@formatter:off
     private static final Pattern CRON_EXP_PTRN = Pattern
-            .compile("(?:"
-                            + "  (?<all>\\*)  # global flag \n"
-                            + "  | (?<start>[0-9]{1,2}|[a-z]{3,3}) \n"
-                            + "      (?:\n"
-                            + "       -(?<end>[0-9]{1,2}|[a-z]{3,3})\n"
-                            + "      )?\n"
-                            + ")\n"
-                            + "(?:(?<incMetaChar>/)(?<inc>[0-9]{1,2}))?        # increment and increment modifier (/)\n",
+            .compile("(?: "
+                            + "   (?:(?<all>\\*)|(?<last>L)|(?<lastwk>LW))  "
+                            + " | (?<start>[0-9]{1,2}|[a-z]{3,3}) "
+                            + "      (?:"
+                            + "         (?<metaChar>L|W)"
+                            + "       | -(?<end>[0-9]{1,2}|[a-z]{3,3}) "
+                            + "      )? "
+                            + ") "
+                            + "(?:(?<incMetaChar>/|\\#)(?<inc>[0-9]{1,2}))? ",
                     Pattern.CASE_INSENSITIVE | Pattern.COMMENTS);
     //@formatter:on
 
     protected FieldType type;
-    private final List<FieldPart> parts = new ArrayList<>();
+    protected final List<FieldPart> parts = new ArrayList<>();
 
     protected BaseField(FieldType type, String fldExp) {
         this.type = type;
         parse(fldExp);
     }
 
-    private void parse(String exp) {
+    protected void parse(String exp) {
         // handle range for expression part
         String[] fldRngParts = exp.split(",");
 
@@ -48,7 +47,9 @@ public abstract class BaseField {
             String startNumber = m.group("start");
             // "-" range is specified
             String endNumber = m.group("end");
-            // "/" increment
+
+            String metaChar = m.group("metaChar");
+            // "/" or "#" increment
             String incMetaChar = m.group("incMetaChar");
             String increment = m.group("inc");
 
@@ -56,6 +57,7 @@ public abstract class BaseField {
 
             if (startNumber != null) {
                 fldPart.from = mapToValue(startNumber);
+                fldPart.metaChar = metaChar;
                 if (endNumber != null) {
                     fldPart.to = mapToValue(endNumber);
                 } else if (increment != null) {
@@ -68,7 +70,10 @@ public abstract class BaseField {
                 fldPart.from = type.getFrom();
                 fldPart.to = type.getTo();
                 fldPart.all = true;
-
+            } else if (m.group("last") != null) {
+                fldPart.metaChar = m.group("last");
+            } else if (m.group("lastwk") != null) {
+                fldPart.metaChar = m.group("lastwk");
             } else {
                 throw new IllegalArgumentException(
                         "Invalid expression field part: " + rngPart + " for field [" + type + "]");
@@ -110,7 +115,7 @@ public abstract class BaseField {
         if (part.metaChar != null) {
             throw new IllegalArgumentException(
                     String.format("Invalid meta character [%s] for field [%s]", part.metaChar, type.toString()));
-        } else if (part.incrementMetaChar != null && !INCREMENT_SEP.equals(part.incrementMetaChar)) {
+        } else if (part.incrementMetaChar != null && !"/".equals(part.incrementMetaChar)) {
             throw new IllegalArgumentException(String.format("Invalid increment meta character [%s] for field [%s]",
                     part.incrementMetaChar, type.toString()));
         }
@@ -136,67 +141,64 @@ public abstract class BaseField {
      *
      * @return set of integer
      */
-    public Set<Integer> get() {
+    public Collection<Integer> get() {
 
-        Set<Integer> result = null;
         switch (type) {
 
             case MINUTE:
-                result = getMinutes();
-                break;
+                return getMinutes();
             case HOUR:
-                result = getHours();
-                break;
+                return getHours();
             case MONTH:
-                result = getMonths();
-                break;
+                return getMonths();
             default:
                 break;
         }
-
-        return result;
+        return null;
     }
 
-    protected Set<Integer> build() {
+    protected Collection<Integer> build() {
 
         Set<Integer> values = new TreeSet<>();
-        parts.forEach(fieldPart -> {
-            // for all (*)
-            if (fieldPart.all && null == fieldPart.incrementMetaChar) {
-                int i = fieldPart.from;
-                while (i <= fieldPart.to) {
-                    values.add(i++);
-                }
-            }
-            // for range (-)
-            else if (null == fieldPart.metaChar && null == fieldPart.incrementMetaChar) {
-                int inc = fieldPart.from;
-                while (inc <= fieldPart.to) {
-                    values.add(inc++);
-                }
-            } // for increment (/)
-            else if (null != fieldPart.incrementMetaChar) {
-                values.add(fieldPart.from);
-                int inc = fieldPart.from + fieldPart.incrementValue;
-                while (inc <= fieldPart.to) {
-                    values.add(inc);
-                    inc = inc + fieldPart.incrementValue;
-                }
-            }
-        });
+        parts.forEach(fieldPart -> extractFieldsValue(values, fieldPart));
 
         return values;
     }
 
+    protected void extractFieldsValue(Collection<Integer> values, FieldPart fieldPart) {
+        // for all (*)
+        if (fieldPart.all && null == fieldPart.incrementMetaChar) {
+            int i = fieldPart.from;
+            while (i <= fieldPart.to) {
+                values.add(i++);
+            }
+        }
+        // for range (-)
+        else if (null == fieldPart.metaChar && null == fieldPart.incrementMetaChar) {
+            int inc = fieldPart.from;
+            while (inc <= fieldPart.to) {
+                values.add(inc++);
+            }
+        } // for increment (/)
+        else if (null != fieldPart.incrementMetaChar) {
+            values.add(fieldPart.from);
+            int inc = fieldPart.from + fieldPart.incrementValue;
+            while (inc <= fieldPart.to) {
+                values.add(inc);
+                inc = inc + fieldPart.incrementValue;
+            }
+        }
+    }
+
     public Set<Integer> getMinutes() {
-        return build();
+        return (Set<Integer>) build();
     }
 
     public Set<Integer> getHours() {
-        return build();
+        return (Set<Integer>) build();
     }
 
     public Set<Integer> getMonths() {
-        return build();
+        return (Set<Integer>) build();
     }
 }
